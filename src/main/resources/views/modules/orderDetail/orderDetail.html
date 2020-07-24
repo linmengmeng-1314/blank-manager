@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>订单详情</title>
+		<meta charset="UTF-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+		<link rel="stylesheet" href="../../css/font-awesome.min.css">
+		<link rel="stylesheet" href="../../plugins/ztree/css/metroStyle/metroStyle.css">
+		<link rel="stylesheet" href="../../css/main.css">
+		<link rel="stylesheet" href="../../plugins/layui-v2.4.5/layui/css/layui.css" media="all">
+		<style type="text/css">
+			.layui-table-view {
+				margin-top: 0;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="rrapp" v-cloak>
+			<div v-show="showList">
+				<div style="margin-bottom: 10px">
+					<div class="layui-row">
+						<div class="layui-col-md10 layui-col-sm6 layui-col-xs12">
+							<div class="layui-row" style="margin-bottom: 10px;">
+								<div class="layui-col-md3 layui-col-sm6 layui-col-xs12">
+									<span>候选人id ：</span>
+									<div class="layui-inline">
+										<input type="text" autocomplete="off" placeholder="候选人id" class="layui-input" style="height:32px;" v-model="q.fkCandidateId"
+										 @keyup.enter="query">
+									</div>
+								</div>
+								<div class="layui-col-md3 layui-col-sm6 layui-col-xs12">
+									<span>姓&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;名：</span>
+									<div class="layui-inline">
+										<input type="text" autocomplete="off" placeholder="姓名" class="layui-input" style="height:32px;" v-model="q.detail1"
+										 @keyup.enter="query">
+									</div>
+								</div>
+								<div class="layui-col-md3 layui-col-sm6 layui-col-xs12">
+									<span>身份证号：</span>
+									<div class="layui-inline">
+										<input type="text" autocomplete="off" placeholder="身份证号" class="layui-input" style="height:32px;" v-model="q.detail2"
+										 @keyup.enter="query">
+									</div>
+								</div>
+								<div class="layui-col-md3 layui-col-sm6 layui-col-xs12">
+									<span>手机号：</span>
+									<div class="layui-inline">
+										<input type="text" autocomplete="off" placeholder="手机号" class="layui-input" style="height:32px;" v-model="q.detail3"
+										 @keyup.enter="query">
+									</div>
+								</div>
+							</div>
+							<div class="layui-row">
+								<div class="layui-col-md3 layui-col-sm6 layui-col-xs12">
+									<span>背调项目：</span>
+									<div class="layui-inline">
+										<input type="text" autocomplete="off" placeholder="背调项目" class="layui-input" style="height:32px;" v-model="q.detail10"
+										 @keyup.enter="query">
+									</div>
+								</div>
+								<div class="layui-col-md3 layui-col-sm6 layui-col-xs12">
+									<span>背调公司：</span>
+									<div class="layui-inline">
+										<input type="text" autocomplete="off" placeholder="背调公司" class="layui-input" style="height:32px;" v-model="q.describe10"
+										 @keyup.enter="query">
+									</div>
+								</div>
+								<div class="layui-col-md6 layui-col-sm6 layui-col-xs12">
+									<span>创建时间：</span>
+									<div class="layui-inline">
+										<input type="text" autocomplete="off" placeholder="开始时间" class="layui-input" style="height:32px;" v-model="q.startTime"
+										 @keyup.enter="query" id="queryStartTime">
+									</div>
+									<span>至</span>
+									<div class="layui-inline">
+										<input type="text" autocomplete="off" placeholder="结束时间" class="layui-input" style="height:32px;" v-model="q.endTime"
+										 @keyup.enter="query" id="queryEndTime">
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="layui-col-md2 layui-col-sm6 layui-col-xs12">
+							<button v-if="hasPermission('orderDetail:queryOrderDetailList')" class="layui-btn layui-btn-sm" @click="query"><i
+								 class="layui-icon layui-icon-search"></i>&nbsp;查询</button>
+						</div>
+					</div>
+				</div>
+				<table id="layuiTable" lay-filter="test"></table>
+			</div>
+
+			<div v-show="!showList" class="panel panel-default">
+				<div style="background: #F2F2F2; padding: 15px;">
+					<div class="layui-card">
+						<div class="layui-card-header">{{title}}</div>
+						<div class="layui-card-body">
+							<form class="layui-form" action="">
+								<div class="layui-form-item">
+									<label class="layui-form-label">主键</label>
+									<div class="layui-input-block">
+										<input type="text" name="id" placeholder="请输入id" autocomplete="off" class="layui-input" v-model="orderDetail.id">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">流水号</label>
+									<div class="layui-input-block">
+										<input type="text" name="fkOrderId" placeholder="请输入fkOrderId" autocomplete="off" class="layui-input" v-model="orderDetail.fkOrderId">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">候选人id</label>
+									<div class="layui-input-block">
+										<input type="text" name="fkCandidateId" placeholder="请输入fkCandidateId" autocomplete="off" class="layui-input"
+										 v-model="orderDetail.fkCandidateId">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">产品编号</label>
+									<div class="layui-input-block">
+										<input type="text" name="fkProductId" placeholder="请输入fkProductId" autocomplete="off" class="layui-input"
+										 v-model="orderDetail.fkProductId">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">渠道流水号</label>
+									<div class="layui-input-block">
+										<input type="text" name="channelVerifyId" placeholder="请输入channelVerifyId" autocomplete="off" class="layui-input"
+										 v-model="orderDetail.channelVerifyId">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">调用时间</label>
+									<div class="layui-input-block">
+										<input type="text" name="callTime" placeholder="请输入callTime" autocomplete="off" class="layui-input" v-model="orderDetail.callTime">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">完成时间</label>
+									<div class="layui-input-block">
+										<input type="text" name="finishTime" placeholder="请输入finishTime" autocomplete="off" class="layui-input"
+										 v-model="orderDetail.finishTime">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">状态[0:待处理,1:已完成,2:调用异常]</label>
+									<div class="layui-input-block">
+										<input type="text" name="state" placeholder="请输入state" autocomplete="off" class="layui-input" v-model="orderDetail.state">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">使用字段数量</label>
+									<div class="layui-input-block">
+										<input type="text" name="sum" placeholder="请输入sum" autocomplete="off" class="layui-input" v-model="orderDetail.sum">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">描述1</label>
+									<div class="layui-input-block">
+										<input type="text" name="describe1" placeholder="请输入describe1" autocomplete="off" class="layui-input" v-model="orderDetail.describe1">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">详情1</label>
+									<div class="layui-input-block">
+										<input type="text" name="detail1" placeholder="请输入detail1" autocomplete="off" class="layui-input" v-model="orderDetail.detail1">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">描述1</label>
+									<div class="layui-input-block">
+										<input type="text" name="describe2" placeholder="请输入describe2" autocomplete="off" class="layui-input" v-model="orderDetail.describe2">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">详情1</label>
+									<div class="layui-input-block">
+										<input type="text" name="detail2" placeholder="请输入detail2" autocomplete="off" class="layui-input" v-model="orderDetail.detail2">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">描述1</label>
+									<div class="layui-input-block">
+										<input type="text" name="describe3" placeholder="请输入describe3" autocomplete="off" class="layui-input" v-model="orderDetail.describe3">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">详情1</label>
+									<div class="layui-input-block">
+										<input type="text" name="detail3" placeholder="请输入detail3" autocomplete="off" class="layui-input" v-model="orderDetail.detail3">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">描述1</label>
+									<div class="layui-input-block">
+										<input type="text" name="describe4" placeholder="请输入describe4" autocomplete="off" class="layui-input" v-model="orderDetail.describe4">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">详情1</label>
+									<div class="layui-input-block">
+										<input type="text" name="detail4" placeholder="请输入detail4" autocomplete="off" class="layui-input" v-model="orderDetail.detail4">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">描述1</label>
+									<div class="layui-input-block">
+										<input type="text" name="describe5" placeholder="请输入describe5" autocomplete="off" class="layui-input" v-model="orderDetail.describe5">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">详情1</label>
+									<div class="layui-input-block">
+										<input type="text" name="detail5" placeholder="请输入detail5" autocomplete="off" class="layui-input" v-model="orderDetail.detail5">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">描述1</label>
+									<div class="layui-input-block">
+										<input type="text" name="describe6" placeholder="请输入describe6" autocomplete="off" class="layui-input" v-model="orderDetail.describe6">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">详情1</label>
+									<div class="layui-input-block">
+										<input type="text" name="detail6" placeholder="请输入detail6" autocomplete="off" class="layui-input" v-model="orderDetail.detail6">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">描述1</label>
+									<div class="layui-input-block">
+										<input type="text" name="describe7" placeholder="请输入describe7" autocomplete="off" class="layui-input" v-model="orderDetail.describe7">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">详情1</label>
+									<div class="layui-input-block">
+										<input type="text" name="detail7" placeholder="请输入detail7" autocomplete="off" class="layui-input" v-model="orderDetail.detail7">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">描述1</label>
+									<div class="layui-input-block">
+										<input type="text" name="describe8" placeholder="请输入describe8" autocomplete="off" class="layui-input" v-model="orderDetail.describe8">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">详情1</label>
+									<div class="layui-input-block">
+										<input type="text" name="detail8" placeholder="请输入detail8" autocomplete="off" class="layui-input" v-model="orderDetail.detail8">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">描述1</label>
+									<div class="layui-input-block">
+										<input type="text" name="describe9" placeholder="请输入describe9" autocomplete="off" class="layui-input" v-model="orderDetail.describe9">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">详情1</label>
+									<div class="layui-input-block">
+										<input type="text" name="detail9" placeholder="请输入detail9" autocomplete="off" class="layui-input" v-model="orderDetail.detail9">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">描述1</label>
+									<div class="layui-input-block">
+										<input type="text" name="describe10" placeholder="请输入describe10" autocomplete="off" class="layui-input"
+										 v-model="orderDetail.describe10">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">详情1</label>
+									<div class="layui-input-block">
+										<input type="text" name="detail10" placeholder="请输入detail10" autocomplete="off" class="layui-input" v-model="orderDetail.detail10">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">创建时间</label>
+									<div class="layui-input-block">
+										<input type="text" name="createTime" placeholder="请输入createTime" autocomplete="off" class="layui-input"
+										 v-model="orderDetail.createTime">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">更新时间</label>
+									<div class="layui-input-block">
+										<input type="text" name="updateTime" placeholder="请输入updateTime" autocomplete="off" class="layui-input"
+										 v-model="orderDetail.updateTime">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">乐观锁</label>
+									<div class="layui-input-block">
+										<input type="text" name="versionOptimizedLock" placeholder="请输入versionOptimizedLock" autocomplete="off" class="layui-input"
+										 v-model="orderDetail.versionOptimizedLock">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<div class="layui-input-block">
+										<button type="button" class="layui-btn" @click="saveOrUpdate">确定</button>
+										<button type="button" class="layui-btn layui-btn-primary" @click="reload">返回</button>
+									</div>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<script src="../../libs/jquery.min.js"></script>
+		<script src="../../plugins/layer/layer.js"></script>
+		<script src="../../libs/vue.min.js"></script>
+		<script src="../../plugins/layui-v2.4.5/layui/layui.js"></script>
+		<script src="../../js/common.js"></script>
+		<script src="../../js/modules/orderDetail/orderDetail.js"></script>
+	</body>
+</html>

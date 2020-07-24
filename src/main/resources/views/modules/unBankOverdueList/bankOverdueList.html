@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>银行逾期名单表</title>
+		<meta charset="UTF-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+		<link rel="stylesheet" href="../../css/font-awesome.min.css">
+		<link rel="stylesheet" href="../../plugins/ztree/css/metroStyle/metroStyle.css">
+		<link rel="stylesheet" href="../../css/main.css">
+		<link rel="stylesheet" href="../../plugins/layui-v2.4.5/layui/css/layui.css" media="all">
+		<style type="text/css">
+			.layui-table-view {
+				margin-top: 0;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="rrapp" v-cloak>
+			<div v-show="showList">
+				<div style="margin-bottom: 10px">
+					<span>姓名：</span>
+					<div class="layui-inline">
+						<input type="text" autocomplete="off" placeholder="姓名" class="layui-input" style="height:32px;" v-model="q.name"
+						 @keyup.enter="query">
+					</div>
+					<span>流水号：</span>
+					<div class="layui-inline">
+						<input type="text" autocomplete="off" placeholder="流水号" class="layui-input" style="height:32px;" v-model="q.verifyId"
+						 @keyup.enter="query">
+					</div>
+					<span>业务流水号：</span>
+					<div class="layui-inline">
+						<input type="text" autocomplete="off" placeholder="业务流水号" class="layui-input" style="height:32px;" v-model="q.busVerifyId"
+						 @keyup.enter="query">
+					</div>
+					<span>渠道流水号：</span>
+					<div class="layui-inline">
+						<input type="text" autocomplete="off" placeholder="渠道流水号" class="layui-input" style="height:32px;" v-model="q.channelVerifyId"
+						 @keyup.enter="query">
+					</div>
+					<button v-if="hasPermission('unBankOverdueList:saveBankOverdueList')" class="layui-btn layui-btn-sm" @click="add"><i
+						 class="layui-icon layui-icon-add-1"></i>&nbsp;新增</button>
+					<button v-if="hasPermission('unBankOverdueList:editBankOverdueList')" class="layui-btn layui-btn-sm" @click="update"><i
+						 class="layui-icon layui-icon-edit"></i>&nbsp;修改</button>
+					<button v-if="hasPermission('unBankOverdueList:deleteBankOverdueList')" class="layui-btn layui-btn-sm" @click="del"><i
+						 class="layui-icon layui-icon-delete"></i>&nbsp;删除</button>
+					<button v-if="hasPermission('unBankOverdueList:queryBankOverdueListList')" class="layui-btn layui-btn-sm" @click="query"><i
+						 class="layui-icon layui-icon-search"></i>&nbsp;查询</button>
+				</div>
+				<table id="layuiTable" lay-filter="test"></table>
+			</div>
+
+			<div v-show="!showList" class="panel panel-default">
+				<div style="background: #F2F2F2; padding: 15px;">
+					<div class="layui-card">
+						<div class="layui-card-header">{{title}}</div>
+						<div class="layui-card-body">
+							<form class="layui-form" action="">
+								<div class="layui-form-item">
+									<label class="layui-form-label">主键</label>
+									<div class="layui-input-block">
+										<input type="text" name="id" placeholder="请输入id" autocomplete="off" class="layui-input" v-model="bankOverdueList.id">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">账户ID</label>
+									<div class="layui-input-block">
+										<input type="text" name="fkAuthorizationId" placeholder="请输入fkAuthorizationId" autocomplete="off" class="layui-input"
+										 v-model="bankOverdueList.fkAuthorizationId">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">流水号</label>
+									<div class="layui-input-block">
+										<input type="text" name="verifyId" placeholder="请输入verifyId" autocomplete="off" class="layui-input" v-model="bankOverdueList.verifyId">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">业务流水号</label>
+									<div class="layui-input-block">
+										<input type="text" name="busVerifyId" placeholder="请输入busVerifyId" autocomplete="off" class="layui-input"
+										 v-model="bankOverdueList.busVerifyId">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">渠道流水号</label>
+									<div class="layui-input-block">
+										<input type="text" name="channelVerifyId" placeholder="请输入channelVerifyId" autocomplete="off" class="layui-input"
+										 v-model="bankOverdueList.channelVerifyId">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">姓名</label>
+									<div class="layui-input-block">
+										<input type="text" name="name" placeholder="请输入name" autocomplete="off" class="layui-input" v-model="bankOverdueList.name">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">身份证号</label>
+									<div class="layui-input-block">
+										<input type="text" name="cardno" placeholder="请输入cardno" autocomplete="off" class="layui-input" v-model="bankOverdueList.cardno">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">手机号</label>
+									<div class="layui-input-block">
+										<input type="text" name="mobile" placeholder="请输入mobile" autocomplete="off" class="layui-input" v-model="bankOverdueList.mobile">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">查询结果状态码[1:查询到逾期详情信息 , 2:未查询到逾期详情信息 ]</label>
+									<div class="layui-input-block">
+										<input type="text" name="res" placeholder="请输入res" autocomplete="off" class="layui-input" v-model="bankOverdueList.res">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">状态码描述</label>
+									<div class="layui-input-block">
+										<input type="text" name="description" placeholder="请输入description" autocomplete="off" class="layui-input"
+										 v-model="bankOverdueList.description">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">平台类型[0:现金贷类,1:消费金融类, 2:车贷类, 3:小贷公司类, 4:支付公司类, 5:银行类, 6:银行现金类, 7:数据公司类 8:征信公司类,
+										9:招聘类, 10:租车类, 11:婚恋类, 12:理财类 13:零售贷类, 14:房贷类, 15:其他类]</label>
+									<div class="layui-input-block">
+										<input type="text" name="pType" placeholder="请输入pType" autocomplete="off" class="layui-input" v-model="bankOverdueList.pType">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">开始逾期时间 </label>
+									<div class="layui-input-block">
+										<input type="text" name="overdueStartTime" placeholder="请输入overdueStartTime" autocomplete="off" class="layui-input"
+										 v-model="bankOverdueList.overdueStartTime">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">逾期天数 </label>
+									<div class="layui-input-block">
+										<input type="text" name="overdueDay" placeholder="请输入overdueDay" autocomplete="off" class="layui-input"
+										 v-model="bankOverdueList.overdueDay">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">逾期金额[如果没有金额，则值为金额不明]</label>
+									<div class="layui-input-block">
+										<input type="text" name="overdueAmt" placeholder="请输入overdueAmt" autocomplete="off" class="layui-input"
+										 v-model="bankOverdueList.overdueAmt">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">逾期次数总计</label>
+									<div class="layui-input-block">
+										<input type="text" name="overdueCnt" placeholder="请输入overdueCnt" autocomplete="off" class="layui-input"
+										 v-model="bankOverdueList.overdueCnt">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">逾期金额总计</label>
+									<div class="layui-input-block">
+										<input type="text" name="overdueAmtCnt" placeholder="请输入overdueAmtCnt" autocomplete="off" class="layui-input"
+										 v-model="bankOverdueList.overdueAmtCnt">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">状态[0:计费,1:不计费,2:处理中]</label>
+									<div class="layui-input-block">
+										<input type="text" name="state" placeholder="请输入state" autocomplete="off" class="layui-input" v-model="bankOverdueList.state">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">响应码</label>
+									<div class="layui-input-block">
+										<input type="text" name="resultCode" placeholder="请输入resultCode" autocomplete="off" class="layui-input"
+										 v-model="bankOverdueList.resultCode">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">响应内容</label>
+									<div class="layui-input-block">
+										<input type="text" name="resultMsg" placeholder="请输入resultMsg" autocomplete="off" class="layui-input" v-model="bankOverdueList.resultMsg">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">通知状态</label>
+									<div class="layui-input-block">
+										<input type="text" name="notityStatus" placeholder="请输入notityStatus" autocomplete="off" class="layui-input"
+										 v-model="bankOverdueList.notityStatus">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">通知时间</label>
+									<div class="layui-input-block">
+										<input type="text" name="notityFinishTime" placeholder="请输入notityFinishTime" autocomplete="off" class="layui-input"
+										 v-model="bankOverdueList.notityFinishTime">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">订单开始时间</label>
+									<div class="layui-input-block">
+										<input type="text" name="verifyBeginTime" placeholder="请输入verifyBeginTime" autocomplete="off" class="layui-input"
+										 v-model="bankOverdueList.verifyBeginTime">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">订单结束时间</label>
+									<div class="layui-input-block">
+										<input type="text" name="verifyEndTime" placeholder="请输入verifyEndTime" autocomplete="off" class="layui-input"
+										 v-model="bankOverdueList.verifyEndTime">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">渠道商</label>
+									<div class="layui-input-block">
+										<input type="text" name="fkChannelId" placeholder="请输入fkChannelId" autocomplete="off" class="layui-input"
+										 v-model="bankOverdueList.fkChannelId">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">产品类型</label>
+									<div class="layui-input-block">
+										<input type="text" name="fkProductId" placeholder="请输入fkProductId" autocomplete="off" class="layui-input"
+										 v-model="bankOverdueList.fkProductId">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">描述</label>
+									<div class="layui-input-block">
+										<input type="text" name="commet" placeholder="请输入commet" autocomplete="off" class="layui-input" v-model="bankOverdueList.commet">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">创建时间</label>
+									<div class="layui-input-block">
+										<input type="text" name="createTime" placeholder="请输入createTime" autocomplete="off" class="layui-input"
+										 v-model="bankOverdueList.createTime">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">更新时间</label>
+									<div class="layui-input-block">
+										<input type="text" name="updateTime" placeholder="请输入updateTime" autocomplete="off" class="layui-input"
+										 v-model="bankOverdueList.updateTime">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">乐观锁</label>
+									<div class="layui-input-block">
+										<input type="text" name="versionOptimizedLock" placeholder="请输入versionOptimizedLock" autocomplete="off" class="layui-input"
+										 v-model="bankOverdueList.versionOptimizedLock">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<div class="layui-input-block">
+										<button type="button" class="layui-btn" @click="saveOrUpdate">确定</button>
+										<button type="button" class="layui-btn layui-btn-primary" @click="reload">返回</button>
+									</div>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<script src="../../libs/jquery.min.js"></script>
+		<script src="../../plugins/layer/layer.js"></script>
+		<script src="../../libs/vue.min.js"></script>
+		<script src="../../plugins/layui-v2.4.5/layui/layui.js"></script>
+		<script src="../../js/common.js"></script>
+		<script src="../../js/formatter.js"></script>
+		<script src="../../js/modules/unBankOverdueList/bankOverdueList.js"></script>
+	</body>
+</html>

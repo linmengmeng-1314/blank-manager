@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title></title>
+		<meta charset="UTF-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+		<link rel="stylesheet" href="../../css/font-awesome.min.css">
+		<link rel="stylesheet" href="../../plugins/ztree/css/metroStyle/metroStyle.css">
+		<link rel="stylesheet" href="../../css/main.css">
+		<link rel="stylesheet" href="../../plugins/layui-v2.4.5/layui/css/layui.css" media="all">
+		<style type="text/css">
+			.layui-table-view {
+				margin-top: 0;
+			}
+
+			.layui-input {
+				height: 32px;
+			}
+
+			/* 弹窗样式 */
+			.custom-layer-box {
+				padding: 10px;
+			}
+
+			.custom-layer-box h4 {
+				padding: 10px 0px;
+				font-weight: bold;
+			}
+
+			.custom-layer-box p {
+				padding: 5px 0px;
+			}
+
+			.custom-layer-box p span.title {
+				display: inline-block;
+				width: 18%;
+				text-align: right;
+			}
+
+			.custom-layer-box p span.content {
+				display: inline-block;
+				width: 30%;
+			}
+
+			.custom-layer-box p span.content img {
+				width: 150px;
+			}
+		</style>
+	</head>
+	<body>
+		<!-- 余额点击跳转 -->
+		<script type="text/html" id="balanceAmt">
+			<a href="javascript:;" class="layui-table-link" style="display: inline-block; width: 100%;" onclick="balanceAmt('{{d.companyName}}')">{{d.balanceAmt}}</a>
+		</script>
+		<!-- 按钮 -->
+		<script type="text/html" id="barDemo">
+			<a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="detail">查看</a>
+			<a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="editAccountAmount">调账</a>
+			<!-- <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="">冻结</a>
+			<a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="">解冻</a> -->
+		</script>
+		<!-- 调账 -->
+		<div id="editAccountAmount" class="custom-layer-box" style="display: none;">
+			<form class="layui-form" action="" method="" id="editAccountAmountForm">
+				<div class="layui-form-item">
+					<label class="layui-form-label">调账类型</label>
+					<div class="layui-input-block">
+						<select name="type" lay-verify="required">
+							<option value=""></option>
+							<option value="3">调账</option>
+							<option value="4">补贴</option>
+						</select>
+					</div>
+				</div>
+				<div class="layui-form-item">
+					<label class="layui-form-label">调账金额</label>
+					<div class="layui-input-block">
+						<input type="text" name="amount" autocomplete="off" placeholder="调账金额" class="layui-input" lay-verify="required|number">
+					</div>
+				</div>
+				<div class="layui-form-item layui-form-text">
+					<label class="layui-form-label">备注</label>
+					<div class="layui-input-block">
+						<textarea name="commet" placeholder="调账原因" class="layui-textarea" lay-verify="required"></textarea>
+					</div>
+				</div>
+				<div class="layui-form-item">
+					<div class="layui-input-block">
+						<button class="layui-btn" lay-submit lay-filter="formDemo">立即提交</button>
+					</div>
+				</div>
+			</form>
+		</div>
+
+		<div id="rrapp" v-cloak>
+			<!-- 查看详情 -->
+			<div id="detailBox" class="custom-layer-box" style="display: none;">
+				<h4>客户信息</h4>
+				<p>
+					<span class="title">用户名：</span>
+					<span class="content">{{detailData.username}}</span>
+					<span class="title">联系人：</span>
+					<span class="content">{{detailData.contacts}}</span>
+				</p>
+				<p>
+					<span class="title">企业名称：</span>
+					<span class="content">{{detailData.companyName}}</span>
+					<span class="title">邮箱：</span>
+					<span class="content">{{detailData.email}}</span>
+				</p>
+				<p>
+					<span class="title">注册时间：</span>
+					<span class="content">{{detailData.createTime}}</span>
+					<span class="title">认证状态：</span>
+					<span class="content">{{authenStatus(detailData.state, "layer")}}</span>
+				</p>
+				<!-- <p>
+					<span class="title">冻结状态：</span>
+					<span class="content">{{detailData.status}}</span>
+				</p> -->
+				<hr class="layui-bg-black">
+				<h4>认证信息</h4>
+				<p>
+					<span class="title">组织机构代码：</span>
+					<span class="content">{{detailData.businessLicenseNumber}}</span>
+					<span class="title">营业执照：</span>
+					<span class="content"><img :src="detailData.businessLicenseImgUrl"></span>
+				</p>
+				<p>
+					<form class="layui-form" action="" method="" id="stateForm">
+						<div class="layui-form-item">
+							<label class="layui-form-label">认证状态</label>
+							<div class="layui-input-block">
+								<select name="state" lay-verify="required">
+									<option value=""></option>
+									<option value="0">审核通过</option>
+									<option value="3">审核未通过</option>
+								</select>
+							</div>
+						</div>
+						<div class="layui-form-item layui-form-text">
+							<label class="layui-form-label">备注</label>
+							<div class="layui-input-block">
+								<textarea name="commet" placeholder="原因" class="layui-textarea" lay-verify="required"></textarea>
+							</div>
+						</div>
+						<div class="layui-form-item">
+							<div class="layui-input-block">
+								<button class="layui-btn" lay-submit lay-filter="stateBtn">立即提交</button>
+							</div>
+						</div>
+					</form>
+				</p>
+			</div>
+			<!-- 顶部按钮 -->
+			<div v-show="showList">
+				<div style="margin-bottom: 10px">
+					<div class="layui-row">
+						<div class="layui-col-md10 layui-col-sm6 layui-col-xs12">
+							<form class="layui-form" action="" @submit.prevent="onSubmit">
+								<div class="layui-row" style="margin-bottom: 10px;">
+									<div class="layui-col-md3 layui-col-sm6 layui-col-xs12">
+										<span>账&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;户：</span>
+										<div class="layui-inline">
+											<input type="text" autocomplete="off" placeholder="账户" class="layui-input" style="height:32px;" v-model="q.username"
+											 @keyup.enter="query">
+										</div>
+									</div>
+									<div class="layui-col-md3 layui-col-sm6 layui-col-xs12">
+										<span>联系人：</span>
+										<div class="layui-inline">
+											<input type="text" autocomplete="off" placeholder="联系人" class="layui-input" style="height:32px;" v-model="q.contacts"
+											 @keyup.enter="query">
+										</div>
+									</div>
+									<div class="layui-col-md3 layui-col-sm6 layui-col-xs12">
+										<span>企业名称：</span>
+										<div class="layui-inline">
+											<input type="text" autocomplete="off" placeholder="企业名称" class="layui-input" style="height:32px;" v-model="q.companyName"
+											 @keyup.enter="query">
+										</div>
+									</div>
+									<div class="layui-col-md3 layui-col-sm6 layui-col-xs12">
+										<span>认证状态：</span>
+										<div class="layui-inline">
+											<select name="state" lay-filter="state" v-model="q.state">
+												<option value=""></option>
+												<option value="0">已认证</option>
+												<option value="1">未认证</option>
+												<option value="2">已申请</option>
+												<option value="3">认证不通过</option>
+											</select>
+										</div>
+									</div>
+								</div>
+								<div class="layui-row">
+									<div class="layui-col-md6 layui-col-sm6 layui-col-xs12">
+										<span>创建时间：</span>
+										<div class="layui-inline">
+											<input type="text" autocomplete="off" placeholder="开始时间" class="layui-input" style="height:32px;" v-model="q.startTime"
+											 @keyup.enter="query" id="queryStartTime">
+										</div>
+										<span>至</span>
+										<div class="layui-inline">
+											<input type="text" autocomplete="off" placeholder="结束时间" class="layui-input" style="height:32px;" v-model="q.endTime"
+											 @keyup.enter="query" id="queryEndTime">
+										</div>
+									</div>
+								</div>
+							</form>
+						</div>
+						<div class="layui-col-md2 layui-col-sm6 layui-col-xs12">
+							<!-- <button v-if="hasPermission('account:saveAccount')" class="layui-btn layui-btn-sm" @click="add"><i class="layui-icon layui-icon-add-1"></i>&nbsp;新增</button>
+							<button v-if="hasPermission('account:editAccount')" class="layui-btn layui-btn-sm" @click="update"><i class="layui-icon layui-icon-edit"></i>&nbsp;修改</button>
+							<button v-if="hasPermission('account:deleteAccount')" class="layui-btn layui-btn-sm" @click="del"><i class="layui-icon layui-icon-delete"></i>&nbsp;删除</button> -->
+							<button v-if="hasPermission('account:queryAccountList')" class="layui-btn layui-btn-sm" @click="query"><i class="layui-icon layui-icon-search"></i>&nbsp;查询</button>
+						</div>
+					</div>
+
+				</div>
+				<table id="layuiTable" lay-filter="test"></table>
+			</div>
+
+			<div v-show="!showList" class="panel panel-default">
+				<div style="background: #F2F2F2; padding: 15px;">
+					<div class="layui-card">
+						<div class="layui-card-header">{{title}}</div>
+						<div class="layui-card-body">
+							<form class="layui-form" action="">
+								<div class="layui-form-item">
+									<label class="layui-form-label"></label>
+									<div class="layui-input-block">
+										<input type="text" name="userId" placeholder="请输入userId" autocomplete="off" class="layui-input" v-model="account.userId">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">用户名</label>
+									<div class="layui-input-block">
+										<input type="text" name="username" placeholder="请输入username" autocomplete="off" class="layui-input" v-model="account.username">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">联系人</label>
+									<div class="layui-input-block">
+										<input type="text" name="contacts" placeholder="请输入contacts" autocomplete="off" class="layui-input" v-model="account.contacts">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">邮箱</label>
+									<div class="layui-input-block">
+										<input type="text" name="email" placeholder="请输入email" autocomplete="off" class="layui-input" v-model="account.email">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">手机号</label>
+									<div class="layui-input-block">
+										<input type="text" name="mobile" placeholder="请输入mobile" autocomplete="off" class="layui-input" v-model="account.mobile">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">状态 1：禁用 0：正常</label>
+									<div class="layui-input-block">
+										<input type="text" name="status" placeholder="请输入status" autocomplete="off" class="layui-input" v-model="account.status">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">创建时间</label>
+									<div class="layui-input-block">
+										<input type="text" name="createTime" placeholder="请输入createTime" autocomplete="off" class="layui-input"
+										 v-model="account.createTime">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">余额</label>
+									<div class="layui-input-block">
+										<input type="text" name="balanceAmt" placeholder="请输入balanceAmt" autocomplete="off" class="layui-input"
+										 v-model="account.balanceAmt">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">锁定金额</label>
+									<div class="layui-input-block">
+										<input type="text" name="lockAmt" placeholder="请输入lockAmt" autocomplete="off" class="layui-input" v-model="account.lockAmt">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">状态[0:正常,1:冻结]</label>
+									<div class="layui-input-block">
+										<input type="text" name="state" placeholder="请输入state" autocomplete="off" class="layui-input" v-model="account.state">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">公司名称</label>
+									<div class="layui-input-block">
+										<input type="text" name="companyName" placeholder="请输入companyName" autocomplete="off" class="layui-input"
+										 v-model="account.companyName">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">营业执照号</label>
+									<div class="layui-input-block">
+										<input type="text" name="businessLicenseNumber" placeholder="请输入businessLicenseNumber" autocomplete="off"
+										 class="layui-input" v-model="account.businessLicenseNumber">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">营业执照复印件</label>
+									<div class="layui-input-block">
+										<input type="text" name="businessLicenseImgUrl" placeholder="请输入businessLicenseImgUrl" autocomplete="off"
+										 class="layui-input" v-model="account.businessLicenseImgUrl">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<div class="layui-input-block">
+										<button type="button" class="layui-btn" @click="saveOrUpdate">确定</button>
+										<button type="button" class="layui-btn layui-btn-primary" @click="reload">返回</button>
+									</div>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<script src="../../libs/jquery.min.js"></script>
+		<script src="../../plugins/layer/layer.js"></script>
+		<script src="../../libs/vue.min.js"></script>
+		<script src="../../plugins/layui-v2.4.5/layui/layui.js"></script>
+		<script src="../../js/common.js"></script>
+		<script src="../../js/formatter.js"></script>
+		<script src="../../js/modules/account/account.js"></script>
+	</body>
+</html>

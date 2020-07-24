@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>门锁信息</title>
+		<meta charset="UTF-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+		<link rel="stylesheet" href="../../css/font-awesome.min.css">
+		<link rel="stylesheet" href="../../plugins/ztree/css/metroStyle/metroStyle.css">
+		<link rel="stylesheet" href="../../css/main.css">
+		<link rel="stylesheet" href="../../plugins/layui-v2.4.5/layui/css/layui.css" media="all">
+		<style type="text/css">
+			.layui-table-view{
+				margin-top: 0;
+			}
+		</style>
+	</head>
+<body>
+	<div id="rrapp" v-cloak>
+		<div v-show="showList">
+			<div style="margin-bottom: 10px">
+				<div class="layui-inline">
+					<input type="text" name="keyWords" id="keyWords" autocomplete="off" placeholder="请输入关键字" class="layui-input" style="height:32px;" v-model="q.keyword" @keyup.enter="query">
+				</div>
+				<button v-if="hasPermission('hsLockInfo:saveLockInfo')" class="layui-btn layui-btn-sm" @click="add"><i class="layui-icon layui-icon-add-1"></i>&nbsp;新增</button>
+				<button v-if="hasPermission('hsLockInfo:editLockInfo')" class="layui-btn layui-btn-sm" @click="update"><i class="layui-icon layui-icon-edit"></i>&nbsp;修改</button>
+				<button v-if="hasPermission('hsLockInfo:deleteLockInfo')" class="layui-btn layui-btn-sm" @click="del"><i class="layui-icon layui-icon-delete"></i>&nbsp;删除</button>
+				<button v-if="hasPermission('hsLockInfo:queryLockInfoList')" class="layui-btn layui-btn-sm" @click="query"><i class="layui-icon layui-icon-search"></i>&nbsp;查询</button>
+			</div>
+			<table id="layuiTable" lay-filter="test"></table>
+	    </div>
+    
+	    <div v-show="!showList" class="panel panel-default">
+	    	<div style="background: #F2F2F2; padding: 15px;">
+				<div class="layui-card">
+					<div class="layui-card-header">{{title}}</div>
+						<div class="layui-card-body">
+							<form class="layui-form" action="">
+								<div class="layui-form-item">
+									<label class="layui-form-label">mac地址</label>
+										<div class="layui-input-block">
+											<input type="text" name="mac" placeholder="请输入mac" autocomplete="off" class="layui-input" v-model="lockInfo.mac">
+										</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">民宿id</label>
+										<div class="layui-input-block">
+											<input type="text" name="fkHouseResourcesId" placeholder="请输入fkHouseResourcesId" autocomplete="off" class="layui-input" v-model="lockInfo.fkHouseResourcesId">
+										</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">民宿房间id</label>
+										<div class="layui-input-block">
+											<input type="text" name="fkRoomId" placeholder="请输入fkRoomId" autocomplete="off" class="layui-input" v-model="lockInfo.fkRoomId">
+										</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">门锁类型[0:门锁]</label>
+										<div class="layui-input-block">
+											<input type="text" name="lockType" placeholder="请输入lockType" autocomplete="off" class="layui-input" v-model="lockInfo.lockType">
+										</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">电池容量，百分比</label>
+										<div class="layui-input-block">
+											<input type="text" name="battery" placeholder="请输入battery" autocomplete="off" class="layui-input" v-model="lockInfo.battery">
+										</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">电池电量上传时间.值为null,代表该门锁,从未上传过电量.</label>
+										<div class="layui-input-block">
+											<input type="text" name="batteryUpdatetime" placeholder="请输入batteryUpdatetime" autocomplete="off" class="layui-input" v-model="lockInfo.batteryUpdatetime">
+										</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">固件版本号（例：2.0.8）</label>
+										<div class="layui-input-block">
+											<input type="text" name="firmwarever" placeholder="请输入firmwarever" autocomplete="off" class="layui-input" v-model="lockInfo.firmwarever">
+										</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">锁内日志索引（记录读取日志的位置）</label>
+										<div class="layui-input-block">
+											<input type="text" name="logidx" placeholder="请输入logidx" autocomplete="off" class="layui-input" v-model="lockInfo.logidx">
+										</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">用户id</label>
+										<div class="layui-input-block">
+											<input type="text" name="fkUserId" placeholder="请输入fkUserId" autocomplete="off" class="layui-input" v-model="lockInfo.fkUserId">
+										</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">创建时间</label>
+										<div class="layui-input-block">
+											<input type="text" name="createTime" placeholder="请输入createTime" autocomplete="off" class="layui-input" v-model="lockInfo.createTime">
+										</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">更新时间</label>
+										<div class="layui-input-block">
+											<input type="text" name="updateTime" placeholder="请输入updateTime" autocomplete="off" class="layui-input" v-model="lockInfo.updateTime">
+										</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">乐观锁</label>
+										<div class="layui-input-block">
+											<input type="text" name="versionOptimizedLock" placeholder="请输入versionOptimizedLock" autocomplete="off" class="layui-input" v-model="lockInfo.versionOptimizedLock">
+										</div>
+								</div>
+								<div class="layui-form-item">
+									<div class="layui-input-block">
+										<button type="button" class="layui-btn" @click="saveOrUpdate">确定</button>
+										<button type="button" class="layui-btn layui-btn-primary" @click="reload">返回</button>
+									</div>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<script src="../../libs/jquery.min.js"></script>
+		<script src="../../plugins/layer/layer.js"></script>
+		<script src="../../libs/vue.min.js"></script>
+		<script src="../../plugins/layui-v2.4.5/layui/layui.js"></script>
+		<script src="../../js/common.js"></script>
+		<script src="../../js/modules/hsLockInfo/lockInfo.js"></script>
+	</body>
+</html>

@@ -1,0 +1,24 @@
+spring:
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://192.168.20.80:3306/blank_manager?allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8&serverTimezone=GMT&useSSL=false
+    username: blank_manager
+    password: blank_manager
+    openMulti: true
+    idle-timeout: 30000
+    multi:
+    - key: master
+      type: com.zaxxer.hikari.HikariDataSource
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      url: jdbc:mysql://192.168.20.80:3306/blank_manager?allowMultiQueries=true&allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8&serverTimezone=GMT&useSSL=false
+      username: blank_manager
+      password: blank_manager
+      idle-timeout: 20000
+
+      
+      
+sdk:
+   mark:
+#      url: http://39.107.138.173/
+      url: http://192.168.3.141:8080/

@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title></title>
+		<meta charset="UTF-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+		<link rel="stylesheet" href="../../css/font-awesome.min.css">
+		<link rel="stylesheet" href="../../plugins/ztree/css/metroStyle/metroStyle.css">
+		<link rel="stylesheet" href="../../css/main.css">
+		<link rel="stylesheet" href="../../plugins/layui-v2.4.5/layui/css/layui.css" media="all">
+		<style type="text/css">
+			.layui-table-view {
+				margin-top: 0;
+			}
+
+			.layui-input {
+				height: 32px;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="rrapp" v-cloak>
+			<div v-show="showList">
+				<div style="margin-bottom: 10px">
+					<div class="layui-row">
+						<div class="layui-col-md10 layui-col-sm6 layui-col-xs12">
+							<form class="layui-form" action="" @submit.prevent="onSubmit">
+								<div class="layui-row" style="margin-bottom: 10px;">
+									<div class="layui-col-md3 layui-col-sm6 layui-col-xs12">
+										<span>订单编号：</span>
+										<div class="layui-inline">
+											<input type="text" autocomplete="off" placeholder="订单编号" class="layui-input" style="height:32px;" v-model="q.fkOrderId"
+											 @keyup.enter="query">
+										</div>
+									</div>
+									<div class="layui-col-md3 layui-col-sm6 layui-col-xs12">
+										<span>公司名称：</span>
+										<div class="layui-inline">
+											<input type="text" autocomplete="off" placeholder="公司名称" class="layui-input" style="height:32px;" v-model="q.companyName"
+											 @keyup.enter="query">
+										</div>
+									</div>
+									<div class="layui-col-md3 layui-col-sm6 layui-col-xs12">
+										<span>交易类型：</span>
+										<div class="layui-inline">
+											<select name="type" lay-filter="type" v-model="q.type">
+												<option value=""></option>
+												<option value="0">充值</option>
+												<option value="1">消费</option>
+												<option value="2">退款</option>
+												<option value="3">调账</option>
+												<option value="4">补贴</option>
+											</select>
+										</div>
+									</div>
+									<div class="layui-col-md3 layui-col-sm6 layui-col-xs12">
+										<span>支付方式：</span>
+										<div class="layui-inline">
+											<select name="paymentType" lay-filter="paymentType" v-model="q.paymentType">
+												<option value=""></option>
+												<option value="0">微信</option>
+												<option value="1">支付宝</option>
+												<option value="2">余额</option>
+												<option value="3">活动</option>
+											</select>
+										</div>
+									</div>
+								</div>
+								<div class="layui-row">
+									<div class="layui-col-md6 layui-col-sm6 layui-col-xs12">
+										<span>创建时间：</span>
+										<div class="layui-inline">
+											<input type="text" autocomplete="off" placeholder="开始时间" class="layui-input" style="height:32px;" v-model="q.startTime"
+											 @keyup.enter="query" id="queryStartTime">
+										</div>
+										<span>至</span>
+										<div class="layui-inline">
+											<input type="text" autocomplete="off" placeholder="结束时间" class="layui-input" style="height:32px;" v-model="q.endTime"
+											 @keyup.enter="query" id="queryEndTime">
+										</div>
+									</div>
+								</div>
+							</form>
+						</div>
+						<div class="layui-col-md2 layui-col-sm6 layui-col-xs12">
+							<button v-if="hasPermission('accountDetail:queryAccountDetailList')" class="layui-btn layui-btn-sm" @click="query"><i
+								 class="layui-icon layui-icon-search"></i>&nbsp;查询</button>
+						</div>
+					</div>
+				</div>
+				<table id="layuiTable" lay-filter="test"></table>
+			</div>
+
+			<div v-show="!showList" class="panel panel-default">
+				<div style="background: #F2F2F2; padding: 15px;">
+					<div class="layui-card">
+						<div class="layui-card-header">{{title}}</div>
+						<div class="layui-card-body">
+							<form class="layui-form" action="">
+								<div class="layui-form-item">
+									<label class="layui-form-label">主键</label>
+									<div class="layui-input-block">
+										<input type="text" name="id" placeholder="请输入id" autocomplete="off" class="layui-input" v-model="accountDetail.id">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">账户表id</label>
+									<div class="layui-input-block">
+										<input type="text" name="fkAccountId" placeholder="请输入fkAccountId" autocomplete="off" class="layui-input"
+										 v-model="accountDetail.fkAccountId">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">订单编号</label>
+									<div class="layui-input-block">
+										<input type="text" name="fkOrderId" placeholder="请输入fkOrderId" autocomplete="off" class="layui-input" v-model="accountDetail.fkOrderId">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">内部部门</label>
+									<div class="layui-input-block">
+										<input type="text" name="fkDeptId" placeholder="请输入fkDeptId" autocomplete="off" class="layui-input" v-model="accountDetail.fkDeptId">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">余额</label>
+									<div class="layui-input-block">
+										<input type="text" name="amt" placeholder="请输入amt" autocomplete="off" class="layui-input" v-model="accountDetail.amt">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">类型[0:充值,1:消费,2退款,3:调账;4:补贴]</label>
+									<div class="layui-input-block">
+										<input type="text" name="type" placeholder="请输入type" autocomplete="off" class="layui-input" v-model="accountDetail.type">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">支付方式[0:微信,1:支付宝,2:余额,3:活动]</label>
+									<div class="layui-input-block">
+										<input type="text" name="paymentType" placeholder="请输入paymentType" autocomplete="off" class="layui-input"
+										 v-model="accountDetail.paymentType">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">用途描述</label>
+									<div class="layui-input-block">
+										<input type="text" name="commet" placeholder="请输入commet" autocomplete="off" class="layui-input" v-model="accountDetail.commet">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">创建时间</label>
+									<div class="layui-input-block">
+										<input type="text" name="createTime" placeholder="请输入createTime" autocomplete="off" class="layui-input"
+										 v-model="accountDetail.createTime">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">更新时间</label>
+									<div class="layui-input-block">
+										<input type="text" name="updateTime" placeholder="请输入updateTime" autocomplete="off" class="layui-input"
+										 v-model="accountDetail.updateTime">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">乐观锁</label>
+									<div class="layui-input-block">
+										<input type="text" name="versionOptimizedLock" placeholder="请输入versionOptimizedLock" autocomplete="off" class="layui-input"
+										 v-model="accountDetail.versionOptimizedLock">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">公司名称</label>
+									<div class="layui-input-block">
+										<input type="text" name="companyName" placeholder="请输入companyName" autocomplete="off" class="layui-input"
+										 v-model="accountDetail.companyName">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<div class="layui-input-block">
+										<button type="button" class="layui-btn" @click="saveOrUpdate">确定</button>
+										<button type="button" class="layui-btn layui-btn-primary" @click="reload">返回</button>
+									</div>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<script src="../../libs/jquery.min.js"></script>
+		<script src="../../plugins/layer/layer.js"></script>
+		<script src="../../libs/vue.min.js"></script>
+		<script src="../../plugins/layui-v2.4.5/layui/layui.js"></script>
+		<script src="../../js/common.js"></script>
+		<script src="../../js/formatter.js"></script>
+		<script src="../../js/modules/accountDetail/accountDetail.js"></script>
+	</body>
+</html>

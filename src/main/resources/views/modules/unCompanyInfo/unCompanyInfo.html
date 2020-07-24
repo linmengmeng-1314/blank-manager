@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>企业客户信息</title>
+		<meta charset="UTF-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+		<link rel="stylesheet" href="../../css/font-awesome.min.css">
+		<link rel="stylesheet" href="../../plugins/ztree/css/metroStyle/metroStyle.css">
+		<link rel="stylesheet" href="../../css/main.css">
+		<link rel="stylesheet" href="../../plugins/layui-v2.4.5/layui/css/layui.css" media="all">
+		<style type="text/css">
+			.layui-table-view {
+				margin-top: 0;
+			}
+
+			.add-input {
+				width: auto;
+			}
+			
+			.layui-form-label {
+			    width: 100px;
+			}
+			
+			.layui-input-block {
+			    margin-left: 130px;
+			}
+		</style>
+	</head>
+	<body>
+		<!-- 剩余次数 -->
+		<script type="text/html" id="lastNumber">
+			{{#  if(d.lastNumber !== null){ }}
+				<a href="javascript:;" class="layui-table-link" style="display: inline-block; width: 100%;" onclick="lastNumber('{{d.productId}}','{{d.lastNumber}}','{{d.id}}','{{d.versionOptimizedLock}}')">{{d.lastNumber}}</a>
+			{{#  } else { }}
+				
+			{{#  } }}
+		</script>
+		<!-- 状态开关 -->
+		<script type="text/html" id="switchState">
+			<input type="checkbox" name="state" data-id="{{d.id}}" data-accessKeyId="{{d.accessKeyId}}" data-versionOptimizedLock="{{d.versionOptimizedLock}}" value="{{d.state}}" lay-skin="switch" lay-text="启用|关闭" lay-filter="state" {{ d.state == 0 ? 'checked' : '' }}>
+		</script>
+		<!-- 授权账户数量 -->
+		<script type="text/html" id="authenticationCount">
+			<a href="javascript:;" class="layui-table-link" style="display: inline-block; width: 100%;" onclick="authenticationCount('{{d.companyId}}')">{{d.authenticationCount}}</a>
+		</script>
+		<!-- 开通产品数量 -->
+		<script type="text/html" id="openProductCount">
+			<a href="javascript:;" class="layui-table-link" style="display: inline-block; width: 100%;" onclick="openProductCount('{{d.companyId}}')">{{d.openProductCount}}</a>
+		</script>
+		<div id="rrapp" v-cloak>
+			<div id="authenBox" style="display: none; padding: 10px;">
+				<table id="authenTable" lay-filter="authenTable"></table>
+				<div style="text-align: center;">
+					<button v-if="hasPermission('unAuthorizationInfo:saveUnAuthorizationInfo')" type="button" class="layui-btn"
+					 onclick="saveUnAuthorizationInfo()">生成凭证</button>
+				</div>
+			</div>
+			<div id="openProductBox" style="display: none; padding: 10px;">
+				<div style="margin-bottom: 10px;">
+					<span>产品名称：</span>
+					<div class="layui-inline">
+						<input type="text" autocomplete="off" placeholder="产品名称" class="layui-input" style="height:32px;" v-model="open.productName"
+						 @keyup.enter="openQuery">
+					</div>
+					<button class="layui-btn layui-btn-sm" @click="openQuery"><i class="layui-icon layui-icon-search"></i>&nbsp;查询</a>
+				</div>
+				<table id="openProductTable" lay-filter="openProductTable"></table>
+			</div>
+			<div v-show="showList">
+				<div style="margin-bottom: 10px">
+					<div class="layui-row">
+						<div class="layui-col-md9 layui-col-sm6 layui-col-xs12">
+							<div class="layui-row">
+								<div class="layui-col-md3 layui-col-sm6 layui-col-xs12">
+									<span>公司编号：</span>
+									<div class="layui-inline">
+										<input type="text" autocomplete="off" placeholder="公司编号" class="layui-input" style="height:32px;" v-model="q.companyId"
+										 @keyup.enter="query">
+									</div>
+								</div>
+								<div class="layui-col-md3 layui-col-sm6 layui-col-xs12">
+									<span>公司名称：</span>
+									<div class="layui-inline">
+										<input type="text" autocomplete="off" placeholder="公司名称" class="layui-input" style="height:32px;" v-model="q.companyName"
+										 @keyup.enter="query">
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="layui-col-md3 layui-col-sm6 layui-col-xs12">
+							<button v-if="hasPermission('unCompanyInfo:saveUnCompanyInfo')" class="layui-btn layui-btn-sm" @click="add"><i
+								 class="layui-icon layui-icon-add-1"></i>&nbsp;新增</button>
+							<button v-if="hasPermission('unCompanyInfo:editUnCompanyInfo')" class="layui-btn layui-btn-sm" @click="update"><i
+								 class="layui-icon layui-icon-edit"></i>&nbsp;修改</button>
+							<button v-if="hasPermission('unCompanyInfo:deleteUnCompanyInfo')" class="layui-btn layui-btn-sm" @click="del"><i
+								 class="layui-icon layui-icon-delete"></i>&nbsp;删除</button>
+							<button v-if="hasPermission('unCompanyInfo:queryUnCompanyInfoList')" class="layui-btn layui-btn-sm" @click="query"><i
+								 class="layui-icon layui-icon-search"></i>&nbsp;查询</button>
+						</div>
+					</div>
+				</div>
+				<table id="layuiTable" lay-filter="test"></table>
+			</div>
+
+			<div v-show="!showList" class="panel panel-default">
+				<div style="background: #F2F2F2; padding: 15px;">
+					<div class="layui-card">
+						<div class="layui-card-header">{{title}}</div>
+						<div class="layui-card-body">
+							<form class="layui-form" action="">
+								<!-- <div class="layui-form-item">
+									<label class="layui-form-label">主键</label>
+									<div class="layui-input-block">
+										<input type="text" name="id" placeholder="请输入id" autocomplete="off" class="layui-input" v-model="unCompanyInfo.id">
+									</div>
+								</div> -->
+								<div class="layui-form-item">
+									<label class="layui-form-label">公司编号</label>
+									<div class="layui-input-block">
+										<input type="text" name="companyId" placeholder="请输入公司编号" autocomplete="off" class="layui-input" v-model="unCompanyInfo.companyId"
+										 lay-verify="required">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">公司名称</label>
+									<div class="layui-input-block">
+										<input type="text" name="companyName" placeholder="请输入公司名称" autocomplete="off" class="layui-input" v-model="unCompanyInfo.companyName"
+										 lay-verify="required">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">公司类型</label>
+									<div class="layui-input-block" id="companyType">
+										<select name="companyType" lay-filter="companyType" v-model="unCompanyInfo.companyType" lay-verify="required">
+											<option value=""></option>
+											<option value="0">国企</option>
+											<option value="1">独资企业</option>
+											<option value="2">合伙企业</option>
+											<option value="3">公司制企业</option>
+											<option value="4">民营企业</option>
+										</select>
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">证件类别</label>
+									<div class="layui-input-block" id="cardType">
+										<select name="cardType" lay-filter="cardType" v-model="unCompanyInfo.cardType" lay-verify="required">
+											<option value=""></option>
+											<option value="0">身份证</option>
+										</select>
+									</div>
+								</div>
+								<!-- <div class="layui-form-item">
+									<label class="layui-form-label">内部部门</label>
+									<div class="layui-input-block">
+										<input type="text" name="fkDeptId" placeholder="请输入fkDeptId" autocomplete="off" class="layui-input" v-model="unCompanyInfo.fkDeptId">
+									</div>
+								</div> -->
+								<div class="layui-form-item">
+									<label class="layui-form-label">法人姓名</label>
+									<div class="layui-input-block">
+										<input type="text" name="legalPerson" placeholder="请输入法人姓名" autocomplete="off" class="layui-input" v-model="unCompanyInfo.legalPerson"
+										 lay-verify="required">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">法人身份证件号</label>
+									<div class="layui-input-block">
+										<input type="text" name="cardNumber" placeholder="请输入身份证件号" autocomplete="off" class="layui-input" v-model="unCompanyInfo.cardNumber"
+										 lay-verify="required">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">手机号码</label>
+									<div class="layui-input-block">
+										<input type="text" name="mobileNumber" placeholder="请输入手机号码" autocomplete="off" class="layui-input" v-model="unCompanyInfo.mobileNumber">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">营业执照号</label>
+									<div class="layui-input-block">
+										<input type="text" name="businessLicenseNumber" placeholder="请输入营业执照号" autocomplete="off" class="layui-input"
+										 v-model="unCompanyInfo.businessLicenseNumber" lay-verify="required">
+									</div>
+								</div>
+								<!-- <div class="layui-form-item">
+									<label class="layui-form-label">营业执照复印件</label>
+									<div class="layui-input-block">
+										<input type="text" name="businessLicenseImgUrl" placeholder="请输入businessLicenseImgUrl" autocomplete="off"
+										 class="layui-input" v-model="unCompanyInfo.businessLicenseImgUrl">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">身份证正面</label>
+									<div class="layui-input-block">
+										<input type="text" name="cardFaceUrl" placeholder="请输入cardFaceUrl" autocomplete="off" class="layui-input"
+										 v-model="unCompanyInfo.cardFaceUrl">
+									</div>
+								</div> -->
+								<div class="layui-form-item">
+									<label class="layui-form-label">描述</label>
+									<div class="layui-input-block">
+										<input type="text" name="comment" placeholder="请输入描述" autocomplete="off" class="layui-input" v-model="unCompanyInfo.comment">
+									</div>
+								</div>
+								<!-- <div class="layui-form-item">
+									<label class="layui-form-label">创建时间</label>
+									<div class="layui-input-block">
+										<input type="text" name="createTime" placeholder="请输入createTime" autocomplete="off" class="layui-input"
+										 v-model="unCompanyInfo.createTime">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">更新时间</label>
+									<div class="layui-input-block">
+										<input type="text" name="updateTime" placeholder="请输入updateTime" autocomplete="off" class="layui-input"
+										 v-model="unCompanyInfo.updateTime">
+									</div>
+								</div> -->
+								<!-- <div class="layui-form-item">
+									<label class="layui-form-label">乐观锁</label>
+									<div class="layui-input-block">
+										<input type="text" name="versionOptimizedLock" placeholder="请输入versionOptimizedLock" autocomplete="off" class="layui-input"
+										 v-model="unCompanyInfo.versionOptimizedLock">
+									</div>
+								</div> -->
+								<div class="layui-form-item">
+									<div class="layui-input-block">
+										<button type="button" class="layui-btn" lay-submit lay-filter="saveBtn" @click="saveOrUpdate">确定</button>
+										<button type="button" class="layui-btn layui-btn-primary" @click="reload">返回</button>
+									</div>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<script src="../../libs/jquery.min.js"></script>
+		<script src="../../plugins/layer/layer.js"></script>
+		<script src="../../libs/vue.min.js"></script>
+		<script src="../../plugins/layui-v2.4.5/layui/layui.js"></script>
+		<script src="../../js/common.js"></script>
+		<script src="../../js/formatter.js"></script>
+		<script src="../../js/modules/unCompanyInfo/unCompanyInfo.js"></script>
+	</body>
+</html>

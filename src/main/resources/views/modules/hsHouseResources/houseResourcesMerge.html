@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title></title>
+		<meta charset="UTF-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+		<link rel="stylesheet" href="../../css/font-awesome.min.css">
+		<link rel="stylesheet" href="../../plugins/ztree/css/metroStyle/metroStyle.css">
+		<link rel="stylesheet" href="../../css/main.css">
+		<link rel="stylesheet" href="../../plugins/layui-v2.4.5/layui/css/layui.css" media="all">
+		<style type="text/css">
+			.layui-table-view {
+				margin-top: 0;
+			}
+
+			.layui-input {
+				height: 32px;
+			}
+		</style>
+	</head>
+	<body>
+		<!-- 房型数量 -->
+		<script type="text/html" id="typeCount">
+			{{#  if(d.typeCount > 0){ }}
+				<a href="javascript:;" class="layui-table-link" style="display: inline-block; width: 100%;" onclick="typeCount('{{d.resourcesName}}')">{{d.typeCount}}</a>
+			{{#  } else { }}
+			    {{d.typeCount}}
+			{{#  } }}
+		</script>
+		<!-- 房间数量 -->
+		<script type="text/html" id="roomCount">
+			{{#  if(d.roomCount > 0){ }}
+				<a href="javascript:;" class="layui-table-link" style="display: inline-block; width: 100%;" onclick="roomCount('{{d.resourcesName}}')">{{d.roomCount}}</a>
+			{{#  } else { }}
+			    {{d.roomCount}}
+			{{#  } }}
+			
+		</script>
+		<div id="rrapp" v-cloak>
+			<div v-show="showList">
+				<div style="margin-bottom: 10px">
+					<div class="layui-row">
+						<div class="layui-col-md9 layui-col-sm6 layui-col-xs12">
+							<form class="layui-form" action="" @submit.prevent="onSubmit">
+								<div class="layui-row" style="margin-bottom: 10px;">
+									<div class="layui-col-md9 layui-col-sm6 layui-col-xs12">
+										<span>省&nbsp;市&nbsp;县&nbsp;&nbsp;：</span>
+										<div class="layui-inline">
+											<select name="province" id="province" lay-search lay-filter="province" v-model="q.fkDeptIdP">
+												<option value="">省份</option>
+											</select>
+										</div>
+										<div class="layui-inline">
+											<select name="city" id="city" lay-search lay-filter="city" v-model="q.fkDeptIdU">
+												<option value="">地级市</option>
+											</select>
+										</div>
+										<div class="layui-inline">
+											<select name="area" id="area" lay-search lay-filter="area" v-model="q.fkDeptIdA">
+												<option value="">县/区</option>
+											</select>
+										</div>
+									</div>
+									<div class="layui-col-md3 layui-col-sm6 layui-col-xs12">
+										<span>民宿名称：</span>
+										<div class="layui-inline">
+											<input type="text" autocomplete="off" placeholder="民宿名称" class="layui-input" style="height:32px;" v-model="q.resourcesName"
+											 @keyup.enter="query">
+										</div>
+									</div>
+								</div>
+								<div class="layui-row">
+									<div class="layui-col-md9 layui-col-sm6 layui-col-xs12">
+										<span>创建时间：</span>
+										<div class="layui-inline">
+											<input type="text" autocomplete="off" placeholder="开始时间" class="layui-input" style="height:32px;" v-model="q.startTime"
+											 @keyup.enter="query" id="queryStartTime">
+										</div>
+										<span>至</span>
+										<div class="layui-inline">
+											<input type="text" autocomplete="off" placeholder="结束时间" class="layui-input" style="height:32px;" v-model="q.endTime"
+											 @keyup.enter="query" id="queryEndTime">
+										</div>
+									</div>
+									<div class="layui-col-md3 layui-col-sm6 layui-col-xs12">
+										<span>手&nbsp;机&nbsp;号&nbsp;&nbsp;：</span>
+										<div class="layui-inline">
+											<input type="text" autocomplete="off" placeholder="手机号" class="layui-input" style="height:32px;" v-model="q.mobile"
+											 @keyup.enter="query">
+										</div>
+									</div>
+								</div>
+							</form>
+						</div>
+						<div class="layui-col-md3 layui-col-sm6 layui-col-xs12">
+							<button v-if="hasPermission('hsHouseResources:saveHouseResourcesMerge')" class="layui-btn layui-btn-sm" @click="add"><i
+								 class="layui-icon layui-icon-add-1"></i>&nbsp;新增</button>
+							<button v-if="hasPermission('hsHouseResources:editHouseResourcesMerge')" class="layui-btn layui-btn-sm" @click="update"><i
+								 class="layui-icon layui-icon-edit"></i>&nbsp;修改</button>
+							<button v-if="hasPermission('hsHouseResources:deleteHouseResourcesMerge')" class="layui-btn layui-btn-sm" @click="del"><i
+								 class="layui-icon layui-icon-delete"></i>&nbsp;删除</button>
+							<button v-if="hasPermission('hsHouseResources:queryHouseResourcesMergeList')" class="layui-btn layui-btn-sm"
+							 @click="query"><i class="layui-icon layui-icon-search"></i>&nbsp;查询</button>
+						</div>
+					</div>
+
+				</div>
+				<table id="layuiTable" lay-filter="test"></table>
+			</div>
+
+			<div v-show="!showList" class="panel panel-default">
+				<div style="background: #F2F2F2; padding: 15px;">
+					<div class="layui-card">
+						<div class="layui-card-header">{{title}}</div>
+						<div class="layui-card-body">
+							<form class="layui-form" action="">
+								<div class="layui-form-item">
+									<label class="layui-form-label">描述</label>
+									<div class="layui-input-block">
+										<input type="text" name="comment" placeholder="请输入comment" autocomplete="off" class="layui-input" v-model="houseResourcesMerge.comment">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">省</label>
+									<div class="layui-input-block">
+										<input type="text" name="fkDeptIdP" placeholder="请输入fkDeptIdP" autocomplete="off" class="layui-input" v-model="houseResourcesMerge.fkDeptIdP">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">市</label>
+									<div class="layui-input-block">
+										<input type="text" name="fkDeptIdU" placeholder="请输入fkDeptIdU" autocomplete="off" class="layui-input" v-model="houseResourcesMerge.fkDeptIdU">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">区</label>
+									<div class="layui-input-block">
+										<input type="text" name="fkDeptIdA" placeholder="请输入fkDeptIdA" autocomplete="off" class="layui-input" v-model="houseResourcesMerge.fkDeptIdA">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">精度</label>
+									<div class="layui-input-block">
+										<input type="text" name="longitude" placeholder="请输入longitude" autocomplete="off" class="layui-input" v-model="houseResourcesMerge.longitude">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">维度</label>
+									<div class="layui-input-block">
+										<input type="text" name="latitude" placeholder="请输入latitude" autocomplete="off" class="layui-input" v-model="houseResourcesMerge.latitude">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">用户id</label>
+									<div class="layui-input-block">
+										<input type="text" name="fkUserId" placeholder="请输入fkUserId" autocomplete="off" class="layui-input" v-model="houseResourcesMerge.fkUserId">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">状态[0:已续费,1:待续费,2:费用已过期]</label>
+									<div class="layui-input-block">
+										<input type="text" name="state" placeholder="请输入state" autocomplete="off" class="layui-input" v-model="houseResourcesMerge.state">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">详细地址</label>
+									<div class="layui-input-block">
+										<input type="text" name="detailAddress" placeholder="请输入detailAddress" autocomplete="off" class="layui-input"
+										 v-model="houseResourcesMerge.detailAddress">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">手机号</label>
+									<div class="layui-input-block">
+										<input type="text" name="mobile" placeholder="请输入mobile" autocomplete="off" class="layui-input" v-model="houseResourcesMerge.mobile">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">别名</label>
+									<div class="layui-input-block">
+										<input type="text" name="area" placeholder="请输入area" autocomplete="off" class="layui-input" v-model="houseResourcesMerge.area">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">别名</label>
+									<div class="layui-input-block">
+										<input type="text" name="roomcount" placeholder="请输入roomcount" autocomplete="off" class="layui-input" v-model="houseResourcesMerge.roomcount">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">别名</label>
+									<div class="layui-input-block">
+										<input type="text" name="city" placeholder="请输入city" autocomplete="off" class="layui-input" v-model="houseResourcesMerge.city">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">别名</label>
+									<div class="layui-input-block">
+										<input type="text" name="resourcesName" placeholder="请输入resourcesName" autocomplete="off" class="layui-input"
+										 v-model="houseResourcesMerge.resourcesName">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">别名</label>
+									<div class="layui-input-block">
+										<input type="text" name="resourcesId" placeholder="请输入resourcesId" autocomplete="off" class="layui-input"
+										 v-model="houseResourcesMerge.resourcesId">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">别名</label>
+									<div class="layui-input-block">
+										<input type="text" name="province" placeholder="请输入province" autocomplete="off" class="layui-input" v-model="houseResourcesMerge.province">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">别名</label>
+									<div class="layui-input-block">
+										<input type="text" name="typecount" placeholder="请输入typecount" autocomplete="off" class="layui-input" v-model="houseResourcesMerge.typecount">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<div class="layui-input-block">
+										<button type="button" class="layui-btn" @click="saveOrUpdate">确定</button>
+										<button type="button" class="layui-btn layui-btn-primary" @click="reload">返回</button>
+									</div>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<script src="../../libs/jquery.min.js"></script>
+		<script src="../../plugins/layer/layer.js"></script>
+		<script src="../../libs/vue.min.js"></script>
+		<script src="../../plugins/layui-v2.4.5/layui/layui.js"></script>
+		<script src="../../js/common.js"></script>
+		<script src="../../js/modules/hsHouseResources/provinceCityArea.js"></script>
+		<script src="../../js/modules/hsHouseResources/houseResourcesMerge.js"></script>
+	</body>
+</html>

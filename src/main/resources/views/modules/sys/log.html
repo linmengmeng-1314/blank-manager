@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>系统日志</title>
+		<meta charset="UTF-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+		<link rel="stylesheet" href="../../css/font-awesome.min.css">
+		<link rel="stylesheet" href="../../plugins/ztree/css/metroStyle/metroStyle.css">
+		<link rel="stylesheet" href="../../css/main.css">
+		<link rel="stylesheet" href="../../plugins/layui-v2.4.5/layui/css/layui.css" media="all">
+		<style type="text/css">
+			.layui-table-view {
+				margin-top: 0;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="rrapp" v-cloak>
+			<div>
+				<div style="margin-bottom: 10px">
+					<div class="layui-inline">
+						<input type="text" autocomplete="off" placeholder="用户名、用户操作" class="layui-input" style="height:32px;" v-model="q.key"
+						 @keyup.enter="query">
+					</div>
+					<button class="layui-btn layui-btn-sm" @click="query"><i class="layui-icon layui-icon-search"></i>&nbsp;查询</button>
+				</div>
+				<table id="layuiTable" lay-filter="test"></table>
+			</div>
+		</div>
+
+		<script src="../../libs/jquery.min.js"></script>
+		<script src="../../plugins/layer/layer.js"></script>
+		<script src="../../libs/vue.min.js"></script>
+		<script src="../../plugins/ztree/jquery.ztree.all.min.js"></script>
+		<script src="../../plugins/layui-v2.4.5/layui/layui.js"></script>
+		<script src="../../js/common.js"></script>
+		<script src="../../js/modules/sys/log.js"></script>
+	</body>
+</html>

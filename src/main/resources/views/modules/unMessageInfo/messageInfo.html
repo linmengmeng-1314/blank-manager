@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>短信记录表</title>
+		<meta charset="UTF-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+		<link rel="stylesheet" href="../../css/font-awesome.min.css">
+		<link rel="stylesheet" href="../../plugins/ztree/css/metroStyle/metroStyle.css">
+		<link rel="stylesheet" href="../../css/main.css">
+		<link rel="stylesheet" href="../../plugins/layui-v2.4.5/layui/css/layui.css" media="all">
+		<style type="text/css">
+			.layui-table-view{
+				margin-top: 0;
+			}
+		</style>
+	</head>
+<body>
+	<div id="rrapp" v-cloak>
+		<div v-show="showList">
+			<div style="margin-bottom: 10px">
+				<div class="layui-inline">
+					<input type="text" name="keyWords" id="keyWords" autocomplete="off" placeholder="请输入关键字" class="layui-input" style="height:32px;" v-model="q.keyword" @keyup.enter="query">
+				</div>
+				<button v-if="hasPermission('unMessageInfo:saveMessageInfo')" class="layui-btn layui-btn-sm" @click="add"><i class="layui-icon layui-icon-add-1"></i>&nbsp;新增</button>
+				<button v-if="hasPermission('unMessageInfo:editMessageInfo')" class="layui-btn layui-btn-sm" @click="update"><i class="layui-icon layui-icon-edit"></i>&nbsp;修改</button>
+				<button v-if="hasPermission('unMessageInfo:deleteMessageInfo')" class="layui-btn layui-btn-sm" @click="del"><i class="layui-icon layui-icon-delete"></i>&nbsp;删除</button>
+				<button v-if="hasPermission('unMessageInfo:queryMessageInfoList')" class="layui-btn layui-btn-sm" @click="query"><i class="layui-icon layui-icon-search"></i>&nbsp;查询</button>
+			</div>
+			<table id="layuiTable" lay-filter="test"></table>
+	    </div>
+    
+	    <div v-show="!showList" class="panel panel-default">
+	    	<div style="background: #F2F2F2; padding: 15px;">
+				<div class="layui-card">
+					<div class="layui-card-header">{{title}}</div>
+						<div class="layui-card-body">
+							<form class="layui-form" action="">
+								<div class="layui-form-item">
+									<label class="layui-form-label">主键</label>
+										<div class="layui-input-block">
+											<input type="text" name="id" placeholder="请输入id" autocomplete="off" class="layui-input" v-model="messageInfo.id">
+										</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">流水号</label>
+										<div class="layui-input-block">
+											<input type="text" name="verifyId" placeholder="请输入verifyId" autocomplete="off" class="layui-input" v-model="messageInfo.verifyId">
+										</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">订单号</label>
+										<div class="layui-input-block">
+											<input type="text" name="orderId" placeholder="请输入orderId" autocomplete="off" class="layui-input" v-model="messageInfo.orderId">
+										</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">消息id</label>
+										<div class="layui-input-block">
+											<input type="text" name="msgid" placeholder="请输入msgid" autocomplete="off" class="layui-input" v-model="messageInfo.msgid">
+										</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">手机号</label>
+										<div class="layui-input-block">
+											<input type="text" name="mobile" placeholder="请输入mobile" autocomplete="off" class="layui-input" v-model="messageInfo.mobile">
+										</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">验证码</label>
+										<div class="layui-input-block">
+											<input type="text" name="messageCode" placeholder="请输入messageCode" autocomplete="off" class="layui-input" v-model="messageInfo.messageCode">
+										</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">运营商返回的状态更新时间，格式YYMMddHHmm，其中YY=年份的最后两位（00-99）</label>
+										<div class="layui-input-block">
+											<input type="text" name="reportTime" placeholder="请输入reportTime" autocomplete="off" class="layui-input" v-model="messageInfo.reportTime">
+										</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">平台收到运营商回复状态报告的时间</label>
+										<div class="layui-input-block">
+											<input type="text" name="notifyTime" placeholder="请输入notifyTime" autocomplete="off" class="layui-input" v-model="messageInfo.notifyTime">
+										</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">响应码</label>
+										<div class="layui-input-block">
+											<input type="text" name="resultCode" placeholder="请输入resultCode" autocomplete="off" class="layui-input" v-model="messageInfo.resultCode">
+										</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">响应内容</label>
+										<div class="layui-input-block">
+											<input type="text" name="resultMsg" placeholder="请输入resultMsg" autocomplete="off" class="layui-input" v-model="messageInfo.resultMsg">
+										</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">运营商返回的状态（详情请前往 code.253.com 查看）</label>
+										<div class="layui-input-block">
+											<input type="text" name="status" placeholder="请输入status" autocomplete="off" class="layui-input" v-model="messageInfo.status">
+										</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">状态说明</label>
+										<div class="layui-input-block">
+											<input type="text" name="statusDesc" placeholder="请输入statusDesc" autocomplete="off" class="layui-input" v-model="messageInfo.statusDesc">
+										</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">短信计费条数</label>
+										<div class="layui-input-block">
+											<input type="text" name="length" placeholder="请输入length" autocomplete="off" class="layui-input" v-model="messageInfo.length">
+										</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">异步通知状态[0:未通知，1:已通知，2:系统内部异常]</label>
+										<div class="layui-input-block">
+											<input type="text" name="notityStatus" placeholder="请输入notityStatus" autocomplete="off" class="layui-input" v-model="messageInfo.notityStatus">
+										</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">异步通知时间</label>
+										<div class="layui-input-block">
+											<input type="text" name="notityFinishTime" placeholder="请输入notityFinishTime" autocomplete="off" class="layui-input" v-model="messageInfo.notityFinishTime">
+										</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">开始时间</label>
+										<div class="layui-input-block">
+											<input type="text" name="smsBeginTime" placeholder="请输入smsBeginTime" autocomplete="off" class="layui-input" v-model="messageInfo.smsBeginTime">
+										</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">结束时间</label>
+										<div class="layui-input-block">
+											<input type="text" name="smsEndTime" placeholder="请输入smsEndTime" autocomplete="off" class="layui-input" v-model="messageInfo.smsEndTime">
+										</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">渠道商</label>
+										<div class="layui-input-block">
+											<input type="text" name="fkChannelId" placeholder="请输入fkChannelId" autocomplete="off" class="layui-input" v-model="messageInfo.fkChannelId">
+										</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">产品类型</label>
+										<div class="layui-input-block">
+											<input type="text" name="fkProductId" placeholder="请输入fkProductId" autocomplete="off" class="layui-input" v-model="messageInfo.fkProductId">
+										</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">描述</label>
+										<div class="layui-input-block">
+											<input type="text" name="commet" placeholder="请输入commet" autocomplete="off" class="layui-input" v-model="messageInfo.commet">
+										</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">创建时间</label>
+										<div class="layui-input-block">
+											<input type="text" name="createTime" placeholder="请输入createTime" autocomplete="off" class="layui-input" v-model="messageInfo.createTime">
+										</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">更新时间</label>
+										<div class="layui-input-block">
+											<input type="text" name="updateTime" placeholder="请输入updateTime" autocomplete="off" class="layui-input" v-model="messageInfo.updateTime">
+										</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">乐观锁</label>
+										<div class="layui-input-block">
+											<input type="text" name="versionOptimizedLock" placeholder="请输入versionOptimizedLock" autocomplete="off" class="layui-input" v-model="messageInfo.versionOptimizedLock">
+										</div>
+								</div>
+								<div class="layui-form-item">
+									<div class="layui-input-block">
+										<button type="button" class="layui-btn" @click="saveOrUpdate">确定</button>
+										<button type="button" class="layui-btn layui-btn-primary" @click="reload">返回</button>
+									</div>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<script src="../../libs/jquery.min.js"></script>
+		<script src="../../plugins/layer/layer.js"></script>
+		<script src="../../libs/vue.min.js"></script>
+		<script src="../../plugins/layui-v2.4.5/layui/layui.js"></script>
+		<script src="../../js/common.js"></script>
+		<script src="../../js/modules/unMessageInfo/messageInfo.js"></script>
+	</body>
+</html>

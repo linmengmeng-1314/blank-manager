@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>活动信息配置</title>
+		<meta charset="UTF-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+		<link rel="stylesheet" href="../../css/font-awesome.min.css">
+		<link rel="stylesheet" href="../../plugins/ztree/css/metroStyle/metroStyle.css">
+		<link rel="stylesheet" href="../../css/main.css">
+		<link rel="stylesheet" href="../../plugins/layui-v2.4.5/layui/css/layui.css" media="all">
+		<style type="text/css">
+			.layui-table-view {
+				margin-top: 0;
+			}
+
+			.layui-input {
+				height: 32px;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="rrapp" v-cloak>
+			<div v-show="showList">
+				<div style="margin-bottom: 10px">
+					<div class="layui-row">
+						<div class="layui-col-md9 layui-col-sm6 layui-col-xs12">
+							<form class="layui-form" action="" method="" @submit.prevent="onSubmit">
+								<div class="layui-row" style="margin-bottom: 10px;">
+									<div class="layui-col-md6 layui-col-sm6 layui-col-xs12">
+										<span>活动编号：</span>
+										<div class="layui-inline">
+											<input type="text" autocomplete="off" placeholder="活动编号" class="layui-input" style="height:32px;" v-model="q.activeId"
+											 @keyup.enter="query">
+										</div>
+									</div>
+									<div class="layui-col-md6 layui-col-sm6 layui-col-xs12">
+										<span>活动名称：</span>
+										<div class="layui-inline">
+											<input type="text" autocomplete="off" placeholder="活动名称" class="layui-input" style="height:32px;" v-model="q.activeName"
+											 @keyup.enter="query">
+										</div>
+									</div>
+								</div>
+								<div class="layui-row">
+									<div class="layui-col-md6 layui-col-sm6 layui-col-xs12">
+										<span>优惠类型：</span>
+										<div class="layui-inline">
+											<select name="type" lay-filter="type" v-model="q.type">
+												<option value=""></option>
+												<option value="0">补贴</option>
+												<option value="1">折扣</option>
+												<option value="2">返现</option>
+												<option value="3">满减</option>
+											</select>
+										</div>
+									</div>
+									<div class="layui-col-md6 layui-col-sm6 layui-col-xs12">
+										<span>有效期开始时间：</span>
+										<div class="layui-inline">
+											<input type="text" autocomplete="off" placeholder="开始时间" class="layui-input" style="height:32px;" v-model="q.startTime"
+											 @keyup.enter="query" id="queryStartTime">
+										</div>
+										<span>至</span>
+										<div class="layui-inline">
+											<input type="text" autocomplete="off" placeholder="结束时间" class="layui-input" style="height:32px;" v-model="q.endTime"
+											 @keyup.enter="query" id="queryEndTime">
+										</div>
+									</div>
+								</div>
+							</form>
+						</div>
+						<div class="layui-col-md3 layui-col-sm6 layui-col-xs12">
+							<button v-if="hasPermission('activeInfo:saveActiveInfo')" class="layui-btn layui-btn-sm" @click="add"><i class="layui-icon layui-icon-add-1"></i>&nbsp;新增</button>
+							<button v-if="hasPermission('activeInfo:editActiveInfo')" class="layui-btn layui-btn-sm" @click="update"><i
+								 class="layui-icon layui-icon-edit"></i>&nbsp;修改</button>
+							<button v-if="hasPermission('activeInfo:deleteActiveInfo')" class="layui-btn layui-btn-sm" @click="del"><i class="layui-icon layui-icon-delete"></i>&nbsp;删除</button>
+							<button v-if="hasPermission('activeInfo:queryActiveInfoList')" class="layui-btn layui-btn-sm" @click="query"><i
+								 class="layui-icon layui-icon-search"></i>&nbsp;查询</button>
+						</div>
+					</div>
+				</div>
+				<table id="layuiTable" lay-filter="test"></table>
+			</div>
+
+			<div v-show="!showList" class="panel panel-default">
+				<div style="background: #F2F2F2; padding: 15px;">
+					<div class="layui-card">
+						<div class="layui-card-header">{{title}}</div>
+						<div class="layui-card-body">
+							<form class="layui-form" action="">
+								<!-- <div class="layui-form-item">
+									<label class="layui-form-label">主键</label>
+									<div class="layui-input-block">
+										<input type="text" name="id" placeholder="请输入id" autocomplete="off" class="layui-input" v-model="activeInfo.id">
+									</div>
+								</div> -->
+								<div class="layui-form-item">
+									<label class="layui-form-label">活动编号</label>
+									<div class="layui-input-block">
+										<input type="text" name="activeId" placeholder="请输入活动编号" autocomplete="off" class="layui-input" v-model="activeInfo.activeId"
+										 lay-verify="required">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">活动名称</label>
+									<div class="layui-input-block">
+										<input type="text" name="activeName" placeholder="请输入活动名称" autocomplete="off" class="layui-input" v-model="activeInfo.activeName"
+										 lay-verify="required">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">金额</label>
+									<div class="layui-input-block">
+										<input type="number" name="amt" placeholder="请输入数字" autocomplete="off" class="layui-input" v-model="activeInfo.amt"
+										 lay-verify="required">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">优惠类型</label>
+									<div class="layui-input-block" id="activeInfoType">
+										<select name="type" lay-filter="activeInfoType" v-model="activeInfo.type" lay-verify="required">
+											<option value=""></option>
+											<option value="0">补贴</option>
+											<option value="1">折扣</option>
+											<option value="2">返现</option>
+											<option value="3">满减</option>
+										</select>
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">corn表达式</label>
+									<div class="layui-input-block">
+										<input type="text" name="corn" placeholder="请输入corn表达式" autocomplete="off" class="layui-input" v-model="activeInfo.corn">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">规则</label>
+									<div class="layui-input-block">
+										<input type="text" name="rule" placeholder="请输入规则" autocomplete="off" class="layui-input" v-model="activeInfo.rule">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">有效期开始时间</label>
+									<div class="layui-input-block">
+										<input type="text" name="startTime" placeholder="请输入开始时间" autocomplete="off" class="layui-input" v-model="activeInfo.startTime"
+										 lay-verify="required" id="startTime">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">有效期结束时间</label>
+									<div class="layui-input-block">
+										<input type="text" name="endTime" placeholder="请输入结束时间" autocomplete="off" class="layui-input" v-model="activeInfo.endTime"
+										 lay-verify="required" id="endTime">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">描述</label>
+									<div class="layui-input-block">
+										<input type="text" name="commet" placeholder="请输入描述" autocomplete="off" class="layui-input" v-model="activeInfo.commet">
+									</div>
+								</div>
+								<!-- <div class="layui-form-item">
+									<label class="layui-form-label">创建时间</label>
+									<div class="layui-input-block">
+										<input type="text" name="createTime" placeholder="请输入createTime" autocomplete="off" class="layui-input"
+										 v-model="activeInfo.createTime" id="createTime">
+									</div>
+								</div>
+								<div class="layui-form-item">
+									<label class="layui-form-label">更新时间</label>
+									<div class="layui-input-block">
+										<input type="text" name="updateTime" placeholder="请输入updateTime" autocomplete="off" class="layui-input"
+										 v-model="activeInfo.updateTime" id="updateTime">
+									</div>
+								</div> -->
+								<!-- <div class="layui-form-item">
+									<label class="layui-form-label">乐观锁</label>
+									<div class="layui-input-block">
+										<input type="text" name="versionOptimizedLock" placeholder="请输入versionOptimizedLock" autocomplete="off" class="layui-input"
+										 v-model="activeInfo.versionOptimizedLock">
+									</div>
+								</div> -->
+								<div class="layui-form-item">
+									<div class="layui-input-block">
+										<button type="button" class="layui-btn" lay-submit lay-filter="saveBtn" @click="saveOrUpdate">确定</button>
+										<button type="button" class="layui-btn layui-btn-primary" @click="reload">返回</button>
+									</div>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<script src="../../libs/jquery.min.js"></script>
+		<script src="../../plugins/layer/layer.js"></script>
+		<script src="../../libs/vue.min.js"></script>
+		<script src="../../plugins/layui-v2.4.5/layui/layui.js"></script>
+		<script src="../../js/common.js"></script>
+		<script src="../../js/formatter.js"></script>
+		<script src="../../js/modules/activeInfo/activeInfo.js"></script>
+	</body>
+</html>
