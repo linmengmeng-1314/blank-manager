@@ -2,6 +2,9 @@ blank-manager
 
 # 空白的管理系统后台
 
+## sql文件
+	为doc目录下的blank_manager.sql， 代码中暂时删减了定时器模块，后面有时间会再加上，数据库中的表依然在
+
 ## 启动时提示 log.path.prefix 异常
 
 	第一次运行需要添加启动参数 -Dlog.path.prefix=logs
