@@ -79,4 +79,4 @@ blank-manager
 		
 		jwt 用于单点登录思路可参考：https://www.cnblogs.com/xieqing/p/6519907.html
 		
-## 未完待续。。。。
+## 未完待续。。。。。。
