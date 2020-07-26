@@ -178,7 +178,16 @@
 			<artifactId>commons-io</artifactId>
 			<version>${commons.io.version}</version>
 		</dependency>
-
+		<dependency>
+			<groupId>com.alipay.sdk</groupId>
+			<artifactId>alipay-sdk-java</artifactId>
+			<version>3.7.73.ALL</version>
+		</dependency>
+		<dependency>
+			<groupId>com.alipay.sdk</groupId>
+			<artifactId>alipay-trade-sdk</artifactId>
+			<version>20161215</version>
+		</dependency>
 	</dependencies>
 		<build>
 		<plugins>
