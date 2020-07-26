@@ -2,8 +2,30 @@ blank-manager
 
 # 空白的管理系统后台
 
+	项目版本：
+		SpringBoot 2.0.1.RELEASE
+		mysql 8.0.11
+		shiro	1.3.2
+		
+	项目结构：
+	com.csi.
+		comment 包为公共组件，包括定义的注解，切面，以及工具类等信息。
+		config 包为项目的配置文件，拦截器。
+		datasource 包为多数据源配置。
+		mapper.base 基础Mapper类
+		modules包下为具体的模块
+			sys 为本系统自带的管理系统模块。
+			sdk.aliyun 阿里云OSS工具类，支付宝支付
+			sdk.wxpay	微信支付，微信小程序等工具
+		BlankManagerApplication.java 项目启动类	
+		Swagger2.java  集成 swagger2 可自动生成接口文档。
+		
+	项目采用shiro进行权限控制，可以用来快速开发，作为一个简单的后台管理系统。 采用 RESTful架构，接口返回统一的 json 格式数据，前端采用layUI和Vue框架。
+	
+	项目定义有全局异常，可以有效拦截异常，防止异常信息暴露至前端 ，以及自定义异常，可以很方便的与前端进行交互。
+
 ## sql文件
-	为doc目录下的blank_manager.sql， 代码中暂时删减了定时器模块，后面有时间会再加上，数据库中的表依然在
+	为doc目录下的blank_manager.sql ，其中dept表中的数据为省市县三级数据，补充了国标中的省市县数据，数据较全面。
 
 ## 启动时提示 log.path.prefix 异常
 
@@ -17,15 +39,13 @@ blank-manager
 	
 	eclipse使用了clean Project后 pom文件，如果 <parent> 行提示异常，则右键项目名，使用maven的update项目就好了
 
-
-
 ## shiro相关
 
 	可参考《Apache Shiro 1.2.x 参考手册》，虽然目前 Shiro 截止到目前已经发布到 1.5.3 版本，但是该手册可以帮我们快速上手shiro。 https://waylau.com/apache-shiro-1.2.x-reference/index.html
 
 	这里没有使用shiro默认的登录认证方法 login，而是采用自定义的登录方式，这样可以灵活配置多用户种类访问此系统。
 	
-	如果想要使用shiro默认的登录认证机制，可在
+	如果想要使用shiro默认的登录认证机制，可在登录接口中直接调用shiro的subject.login 方法。
 	
 	
 	请求进来时，会走shiro的web.filter.AccessControlFilter类中，这里自定义实现了此过滤器(OAuth2Filter)，
@@ -57,3 +77,5 @@ blank-manager
 		输出是三个由点分隔的Base64-URL字符串，可以在HTML和HTTP环境中轻松传递。
 		
 		jwt 用于单点登录思路可参考：https://www.cnblogs.com/xieqing/p/6519907.html
+		
+## 未完待续。。。。
