@@ -1,4 +1,4 @@
-package com.csi.modules.sys.oauth2;
+package com.csi.modules.sys.shiro;
 
 import java.util.List;
 import java.util.Set;
@@ -24,11 +24,10 @@ import com.csi.modules.sys.entity.SysUserTokenEntity;
 import com.csi.modules.sys.service.ShiroService;
 
 /**
- * 认证
- *
- * @author wanghonghui
- * @email 448697783@qq.com
- * @date 2017-05-20 14:00
+ * 自定义认证
+ * 	提供用户权限给shiro
+ * @author linmengmeng
+ * @date 2018-05-20 14:00
  */
 @Component
 public class OAuth2Realm extends AuthorizingRealm {

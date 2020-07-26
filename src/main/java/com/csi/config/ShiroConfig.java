@@ -17,15 +17,14 @@ import org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreato
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.csi.modules.sys.oauth2.OAuth2Filter;
-import com.csi.modules.sys.oauth2.OAuth2Realm;
+import com.csi.modules.sys.shiro.OAuth2Filter;
+import com.csi.modules.sys.shiro.OAuth2Realm;
 
 /**
  * Shiro配置
  *
- * @author wanghonghui
- * @email 448697783@qq.com
- * @date 2017-04-20 18:33
+ * @author linmengmeng
+ * @date 2018-05-20 17:00
  */
 @Configuration
 public class ShiroConfig {
@@ -64,6 +63,7 @@ public class ShiroConfig {
         filterMap.put("/druid/**", "anon");
         filterMap.put("/api/**", "anon");
         filterMap.put("/sys/login", "anon");
+        filterMap.put("/sys/logout", "anon");
         filterMap.put("/img/**", "anon");
         filterMap.put("/**/*.css", "anon");
         filterMap.put("/**/*.png", "anon");

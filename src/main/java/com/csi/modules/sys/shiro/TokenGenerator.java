@@ -1,4 +1,4 @@
-package com.csi.modules.sys.oauth2;
+package com.csi.modules.sys.shiro;
 
 import java.security.MessageDigest;
 import java.util.UUID;
@@ -6,11 +6,10 @@ import java.util.UUID;
 import com.csi.common.exception.BusinessException;
 
 /**
- * 生成token
+ * 自定义token生成规则
  *
- * @author wanghonghui
- * @email 448697783@qq.com
- * @date 2017-05-20 14:41
+ * @author linmengmeng
+ * @date 2018-05-20 14:00
  */
 public class TokenGenerator {
 

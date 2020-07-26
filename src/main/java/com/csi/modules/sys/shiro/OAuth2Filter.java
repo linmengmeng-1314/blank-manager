@@ -1,4 +1,4 @@
-package com.csi.modules.sys.oauth2;
+package com.csi.modules.sys.shiro;
 
 import java.io.IOException;
 
@@ -15,15 +15,13 @@ import org.apache.shiro.web.filter.authc.AuthenticatingFilter;
 import org.apache.shiro.web.servlet.ShiroHttpServletRequest;
 
 import com.alibaba.fastjson.JSON;
-
 import com.csi.common.utils.R;
 
 /**
- * oauth2过滤器
+ * 自定义过滤器
  *
- * @author wanghonghui
- * @email 448697783@qq.com
- * @date 2017-05-20 13:00
+ * @author linmengmeng
+ * @date 2018-05-20 14:00
  */
 public class OAuth2Filter extends AuthenticatingFilter {
 

@@ -6,8 +6,8 @@ import org.springframework.stereotype.Service;
 import com.csi.common.utils.R;
 import com.csi.modules.sys.dao.SysUserTokenDao;
 import com.csi.modules.sys.entity.SysUserTokenEntity;
-import com.csi.modules.sys.oauth2.TokenGenerator;
 import com.csi.modules.sys.service.SysUserTokenService;
+import com.csi.modules.sys.shiro.TokenGenerator;
 
 import java.util.Date;
 
