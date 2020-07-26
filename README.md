@@ -24,8 +24,9 @@ blank-manager
 	
 	项目定义有全局异常，可以有效拦截异常，防止异常信息暴露至前端 ，以及自定义异常，可以很方便的与前端进行交互。
 
-## sql文件
-	为doc目录下的blank_manager.sql ，其中dept表中的数据为省市县三级数据，补充了国标中的省市县数据，数据较全面。
+## doc文件夹说明
+	项目sql脚本为doc目录下的blank_manager.sql ，其中dept表中的数据为省市县三级数据，补充了国标中的省市县数据，数据较全面。
+	项目中集成支付宝支付时封装了 alipay 相关的jar包，压缩文件sdk.zip 为支付宝支付的相关jar包，解压压缩包内容至本地maven仓库的 com\alipay\sdk 文件夹下即可。
 
 ## 启动时提示 log.path.prefix 异常
 
