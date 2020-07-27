@@ -79,4 +79,7 @@ blank-manager
 		
 		jwt 用于单点登录思路可参考：https://www.cnblogs.com/xieqing/p/6519907.html
 		
+## 项目演示：
+	启动成功后在浏览器中访问：http://localhost:1111/manager/login.html  用户名和密码都是admin
+	
 ## 未完待续。。。。
