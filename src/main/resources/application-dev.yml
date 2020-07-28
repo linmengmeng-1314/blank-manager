@@ -15,6 +15,13 @@ spring:
       username: blank_manager
       password: blank_manager
       idle-timeout: 20000
+    - key: us_mqadmin
+      type: com.zaxxer.hikari.HikariDataSource
+      driver-class-name: oracle.jdbc.driver.OracleDriver
+      url: jdbc:oracle:thin:@192.168.20.118:1521:orcl
+      username: US_MQADMIN
+      password: jaqz2018
+      idle-timeout: 20000
 
       
       
@@ -22,3 +29,6 @@ sdk:
    mark:
 #      url: http://39.107.138.173/
       url: http://192.168.3.141:8080/
+      
+
+    

@@ -10,7 +10,8 @@ public enum DataSourceEnum {
 	DATASOURCE_MASTER("master"),
 	DATASOURCE_MARS("mars"),
 	DATASOURCE_UNIFIED_CRTIFY("unified_crtify"),
-	DATASOURCE_HOMESTAY("homestay");
+	DATASOURCE_HOMESTAY("homestay"),
+	DATASOURCE_MQADMIN("us_mqadmin");
 
 	private String value;
 
