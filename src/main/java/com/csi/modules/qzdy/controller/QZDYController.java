@@ -11,9 +11,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.alibaba.fastjson.JSON;
 import com.csi.common.annotation.CtrlLog;
-import com.csi.common.annotation.DataSource;
-import com.csi.common.baseenum.DataSourceEnum;
 import com.csi.common.utils.BeanCopierUtils;
 import com.csi.common.validator.ValidatorUtils;
 import com.csi.modules.qzdy.entity.QZDYEntity;
@@ -61,12 +60,13 @@ public class QZDYController {
 	@RequiresPermissions("qzdy:queryQZDYList")
 	@ApiOperation(value="查询",notes="注意问题点")
 	@ResponseBody
-	@DataSource(DataSourceEnum.DATASOURCE_MQADMIN)
+//	@DataSource(DataSourceEnum.DATASOURCE_MQADMIN)
 	public QZDYQResultVO queryQZDYList(@ApiParam("查询参数")QZDYQueryVO  qZDYQueryVO){
+		System.out.println("qZDYQueryVO:" + JSON.toJSONString(qZDYQueryVO));
 		ValidatorUtils.validateEntity(qZDYQueryVO);
 		QZDYEntity qZDYEntity = new QZDYEntity();
 		BeanCopierUtils.copyProperties(qZDYQueryVO, qZDYEntity);
-		List<QZDYEntity> qZDYList = qZDYService.queryQZDYEntityListForPage(qZDYEntity,qZDYQueryVO.getStartRow(),qZDYQueryVO.getRows());
+		List<QZDYEntity> qZDYList = qZDYService.queryQZDYEntityListForPage(qZDYEntity,qZDYQueryVO.getStartRow(),qZDYQueryVO.getEndRow());
 		//统计行数,如果数据量比较大可以才线程同时处理两个语句
 		Long count= qZDYService.queryQZDYEntityListForPageCount(qZDYEntity);
 		QZDYQResultVO qZDYQResultVO = qZDYQueryVO.ok(qZDYList);
@@ -83,7 +83,7 @@ public class QZDYController {
 	@RequiresPermissions("qzdy:saveQZDY")
 	@ApiOperation(value="保存",notes="注意问题点")
 	@ResponseBody
-	@DataSource(DataSourceEnum.DATASOURCE_MQADMIN)
+	//@DataSource(DataSourceEnum.DATASOURCE_MQADMIN)
 	public QZDYSResultVO saveQZDY(@ApiParam("保存参数")@RequestBody(required=false) QZDYSaveVO  qZDYSaveVO){
 		ValidatorUtils.validateEntity(qZDYSaveVO);
 		QZDYEntity qZDYEntity = new QZDYEntity();
@@ -102,7 +102,7 @@ public class QZDYController {
 	@RequiresPermissions("qzdy:saveQZDYList")
 	@ApiOperation(value="保存",notes="注意问题点")
 	@ResponseBody
-	@DataSource(DataSourceEnum.DATASOURCE_MQADMIN)
+	//@DataSource(DataSourceEnum.DATASOURCE_MQADMIN)
 	public QZDYSResultVO saveQZDYList(@ApiParam("保存参数")@RequestBody(required=false) List<QZDYSaveVO>  qZDYSaveVOList){
 		ValidatorUtils.validateEntity(qZDYSaveVOList);
 		
@@ -127,7 +127,7 @@ public class QZDYController {
 	@RequiresPermissions("qzdy:editQZDY")
 	@ApiOperation(value="更新",notes="注意问题点")
 	@ResponseBody
-	@DataSource(DataSourceEnum.DATASOURCE_MQADMIN)
+	//@DataSource(DataSourceEnum.DATASOURCE_MQADMIN)
 	public QZDYEResultVO editQZDY(@ApiParam("更新参数")@RequestBody(required=false)QZDYEditVO qZDYEditVO){
 		ValidatorUtils.validateEntity(qZDYEditVO);
 		QZDYEntity qZDYEntity = new QZDYEntity();
@@ -146,7 +146,7 @@ public class QZDYController {
 	@RequiresPermissions("qzdy:editQZDYList")
 	@ApiOperation(value="更新",notes="注意问题点")
 	@ResponseBody
-	@DataSource(DataSourceEnum.DATASOURCE_MQADMIN)
+	//@DataSource(DataSourceEnum.DATASOURCE_MQADMIN)
 	public QZDYEResultVO editQZDYList(@ApiParam("更新参数")@RequestBody(required=false) List<QZDYEditVO> qZDYEditVOList){
 		ValidatorUtils.validateEntity(qZDYEditVOList);
 		QZDYEntity entity = null;
@@ -170,7 +170,7 @@ public class QZDYController {
 	@RequiresPermissions("qzdy:deleteQZDY")
 	@ApiOperation(value="删除",notes="注意问题点")
 	@ResponseBody
-	@DataSource(DataSourceEnum.DATASOURCE_MQADMIN)
+	//@DataSource(DataSourceEnum.DATASOURCE_MQADMIN)
 	public QZDYDResultVO deleteQZDY(@ApiParam("更新参数") QZDYDeleteVO qZDYDeleteVO){
 		ValidatorUtils.validateEntity(qZDYDeleteVO);
 		QZDYEntity qZDYEntity = new QZDYEntity();
@@ -189,7 +189,7 @@ public class QZDYController {
 	@RequiresPermissions("qzdy:deleteQZDYList")
 	@ApiOperation(value="删除",notes="注意问题点")
 	@ResponseBody
-	@DataSource(DataSourceEnum.DATASOURCE_MQADMIN)
+	//@DataSource(DataSourceEnum.DATASOURCE_MQADMIN)
 	public QZDYDResultVO deleteQZDYList(@ApiParam("更新参数") @RequestBody List<QZDYDeleteVO> qZDYDeleteVOList){
 		ValidatorUtils.validateEntity(qZDYDeleteVOList);
 		QZDYEntity entity = null;
